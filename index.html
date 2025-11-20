@@ -1,0 +1,1932 @@
+import React, { useState, useMemo, useEffect } from 'react';
+import { BookOpen, ChevronLeft, ChevronRight, CheckCircle, XCircle, Eye, RotateCcw, Award, AlertCircle, CheckSquare, Square, Book, Filter } from 'lucide-react';
+
+// --- 1. Question Bank Data ---
+const QUESTION_BANK = [
+  // --- TOPIC 1: AI WORKLOADS & RESPONSIBLE AI ---
+  {
+    id: 1,
+    type: 'single',
+    question: "A company employs a team of customer service agents. The company develops a webchat bot to provide automated answers to common queries. Which business benefit should the company expect?",
+    options: ["A. increased sales", "B. a reduced workload for the customer service agents", "C. improved product reliability"],
+    correctAnswer: "B",
+    explanation: "Bots automate routine tasks, allowing agents to focus on complex issues."
+  },
+  {
+    id: 4,
+    type: 'single',
+    question: "You need to ensure that a model meets the Microsoft transparency principle. What should you do in the Automated ML UI?",
+    options: ["A. Set Validation type to Auto.", "B. Enable Explain best model.", "C. Set Primary metric to accuracy."],
+    correctAnswer: "B",
+    explanation: "Model explainability is key to Transparency."
+  },
+  {
+    id: 6,
+    type: 'single',
+    question: "The handling of unusual or missing values provided to an AI system is a consideration for which principle?",
+    options: ["A. inclusiveness", "B. privacy and security", "C. reliability and safety", "D. transparency"],
+    correctAnswer: "C"
+  },
+  {
+    id: 7_1,
+    type: 'single',
+    question: "Scenario: 'An automated chat to answer questions about refunds'. Which workload?",
+    options: ["A. Anomaly detection", "B. Computer vision", "C. Conversational AI", "D. Knowledge mining"],
+    correctAnswer: "C"
+  },
+  {
+    id: 7_2,
+    type: 'single',
+    question: "Scenario: 'Determining whether a photo contains a person'. Which workload?",
+    options: ["A. Anomaly detection", "B. Computer vision", "C. Conversational AI"],
+    correctAnswer: "B"
+  },
+  {
+    id: 7_3,
+    type: 'single',
+    question: "Scenario: 'Determining whether a review is positive or negative'. Which workload?",
+    options: ["A. Computer vision", "B. Conversational AI", "C. Natural language processing"],
+    correctAnswer: "C"
+  },
+  {
+    id: 8,
+    type: 'single',
+    question: "Designing an AI system that empowers people with hearing/visual impairments helps meet which principle?",
+    options: ["A. fairness", "B. inclusiveness", "C. reliability and safety", "D. accountability"],
+    correctAnswer: "B"
+  },
+  {
+    id: 9_1,
+    type: 'single',
+    question: "Which principle ensures AI systems operate as designed and resist harmful manipulation?",
+    options: ["A. Accountability", "B. Fairness", "C. Reliability and safety"],
+    correctAnswer: "C"
+  },
+  {
+    id: 10,
+    type: 'single',
+    question: "For self-driving cars, which principle ensures consistent operation during unexpected circumstances?",
+    options: ["A. inclusiveness", "B. reliability and safety", "C. fairness"],
+    correctAnswer: "B"
+  },
+  {
+    id: 11,
+    type: 'single',
+    question: "Which task ensures a service meets the Transparency principle?",
+    options: ["A. Enable autoscaling.", "B. Provide documentation to help developers debug code.", "C. Ensure training data is representative."],
+    correctAnswer: "B"
+  },
+  {
+    id: 12_1,
+    type: 'single',
+    question: "Scenario: 'Identify handwritten letters'. Which workload?",
+    options: ["A. Anomaly detection", "B. Computer vision", "C. Regression"],
+    correctAnswer: "B"
+  },
+  {
+    id: 12_2,
+    type: 'single',
+    question: "Scenario: 'Predict the sentiment of a social media post'. Which workload?",
+    options: ["A. Computer vision", "B. Natural language processing", "C. Regression"],
+    correctAnswer: "B"
+  },
+  {
+    id: 12_3,
+    type: 'single',
+    question: "Scenario: 'Identify a fraudulent credit card payment'. Which workload?",
+    options: ["A. Anomaly detection", "B. Computer vision", "C. NLP"],
+    correctAnswer: "A"
+  },
+  {
+    id: 14,
+    type: 'multiple',
+    question: "What are three Microsoft guiding principles for responsible AI? (Select three)",
+    options: ["A. knowledgeability", "B. inclusiveness", "C. fairness", "D. reliability and safety", "E. decisiveness"],
+    correctAnswer: ["B", "C", "D"]
+  },
+  {
+    id: 18,
+    type: 'single',
+    question: "Loan approval factors should be explainable. Which principle?",
+    options: ["A. transparency", "B. inclusiveness", "C. fairness"],
+    correctAnswer: "A"
+  },
+  {
+    id: 19_1,
+    type: 'single',
+    question: "True or False: Providing an explanation of the outcome of a credit loan is an example of Transparency.",
+    options: ["A. True", "B. False"],
+    correctAnswer: "A"
+  },
+  {
+    id: 19_2,
+    type: 'single',
+    question: "True or False: A triage bot prioritizing claims based on injuries is an example of Reliability and Safety.",
+    options: ["A. True", "B. False"],
+    correctAnswer: "B",
+    explanation: "This is typically Fairness or Accountability."
+  },
+  {
+    id: 20_1,
+    type: 'single',
+    question: "Match Principle: 'The system must not discriminate based on gender/race'.",
+    options: ["A. Fairness", "B. Privacy", "C. Reliability"],
+    correctAnswer: "A"
+  },
+  {
+    id: 20_2,
+    type: 'single',
+    question: "Match Principle: 'Personal data must be visible only to approved users'.",
+    options: ["A. Fairness", "B. Privacy and security", "C. Transparency"],
+    correctAnswer: "B"
+  },
+  {
+    id: 22,
+    type: 'multiple',
+    question: "Building an AI app using Responsible AI. Which two principles to follow?",
+    options: ["A. Implement Agile development", "B. Implement AI model validation", "C. Establish a risk governance committee", "D. Prevent disclosure of AI use"],
+    correctAnswer: ["B", "C"]
+  },
+  {
+    id: 23,
+    type: 'single',
+    question: "AI systems should NOT reflect biases from training data. Which principle?",
+    options: ["A. accountability", "B. fairness", "C. inclusiveness"],
+    correctAnswer: "B"
+  },
+  {
+    id: 24,
+    type: 'single',
+    question: "Checks and balances to ensure decisions don't discriminate is an example of which principle?",
+    options: ["A. accountability", "B. fairness", "C. transparency"],
+    correctAnswer: "B"
+  },
+  {
+    id: 61,
+    type: 'single',
+    question: "Ensuring an AI system does not provide a prediction when important fields contain unusual values is which principle?",
+    options: ["A. inclusiveness", "B. privacy and security", "C. reliability and safety"],
+    correctAnswer: "C"
+  },
+  {
+    id: 151,
+    type: 'single',
+    question: "Which statement is an example of a Microsoft responsible AI principle?",
+    options: ["A. AI systems must use only publicly available data", "B. AI systems must be transparent and inclusive", "C. AI systems must keep personal details public"],
+    correctAnswer: "B"
+  },
+  {
+    id: 154_1,
+    type: 'single',
+    question: "Match Principle: 'Ensure AI systems operate as designed'.",
+    options: ["A. Reliability and safety", "B. Fairness", "C. Accountability"],
+    correctAnswer: "A"
+  },
+  {
+    id: 154_2,
+    type: 'single',
+    question: "Match Principle: 'Provide consumers control over their data'.",
+    options: ["A. Privacy and security", "B. Fairness", "C. Transparency"],
+    correctAnswer: "A"
+  },
+  {
+    id: 156,
+    type: 'single',
+    question: "NLP model created using data obtained without permission. Which principle breached?",
+    options: ["A. reliability and safety", "B. privacy and security", "C. inclusiveness"],
+    correctAnswer: "B"
+  },
+  {
+    id: 160,
+    type: 'single',
+    question: "AI loan system has gender bias. Which principle violated?",
+    options: ["A. accountability", "B. reliability", "C. fairness"],
+    correctAnswer: "C"
+  },
+  {
+    id: 161,
+    type: 'single',
+    question: "You need to minimize bias in an insurance prediction system. What should you do?",
+    options: ["A. Remove protected characteristics before sampling.", "B. Take a representative training sample.", "C. Use global data only."],
+    correctAnswer: "B"
+  },
+  {
+    id: 208_1,
+    type: 'single',
+    question: "Match Principle: 'Visualizing how the model works'.",
+    options: ["A. Transparency", "B. Accountability", "C. Fairness"],
+    correctAnswer: "A"
+  },
+  {
+    id: 211,
+    type: 'single',
+    question: "Voice recognition identifying barriers for specific user groups. Which principle?",
+    options: ["A. accountability", "B. fairness", "C. inclusiveness"],
+    correctAnswer: "C"
+  },
+  {
+    id: 232,
+    type: 'single',
+    question: "Example of Transparency?",
+    options: ["A. Allocating opportunities equally", "B. Helping users understand decisions made by AI", "C. Secure data storage"],
+    correctAnswer: "B"
+  },
+
+  // --- TOPIC 2: MACHINE LEARNING FUNDAMENTALS ---
+  {
+    id: 2,
+    type: 'single',
+    question: "How should you split data for training and evaluation?",
+    options: ["A. Use features for training and labels for evaluation.", "B. Randomly split the data into rows.", "C. Use labels for training and features for evaluation."],
+    correctAnswer: "B"
+  },
+  {
+    id: 3,
+    type: 'single',
+    question: "Confusion matrix: Predicted=1, Actual=1 contains 11. How many correctly predicted positives?",
+    options: ["A. 5", "B. 11", "C. 1,033"],
+    correctAnswer: "B"
+  },
+  {
+    id: 5_1,
+    type: 'single',
+    question: "True or False: Forecasting housing prices based on historical data is anomaly detection.",
+    options: ["A. True", "B. False"],
+    correctAnswer: "B",
+    explanation: "It is Regression."
+  },
+  {
+    id: 5_2,
+    type: 'single',
+    question: "True or False: Identifying suspicious sign-ins is anomaly detection.",
+    options: ["A. True", "B. False"],
+    correctAnswer: "A"
+  },
+  {
+    id: 16,
+    type: 'single',
+    question: "Which process is used to generate additional features?",
+    options: ["A. Feature engineering", "B. Feature selection", "C. Model evaluation"],
+    correctAnswer: "A"
+  },
+  {
+    id: 21,
+    type: 'single',
+    question: "What is the correct sequence for deploying a model?",
+    options: ["A. Train -> Prepare Data -> Evaluate", "B. Prepare Data -> Train -> Evaluate", "C. Evaluate -> Train -> Prepare"],
+    correctAnswer: "B"
+  },
+  {
+    id: 26_1,
+    type: 'single',
+    question: "Task: 'Examining the values of a confusion matrix'.",
+    options: ["A. Feature engineering", "B. Model evaluation", "C. Model training"],
+    correctAnswer: "B"
+  },
+  {
+    id: 27,
+    type: 'single',
+    question: "Data values that influence the prediction of a model are called:",
+    options: ["A. features", "B. labels", "C. identifiers"],
+    correctAnswer: "A"
+  },
+  {
+    id: 28,
+    type: 'single',
+    question: "A 'Predicted vs. True' chart showing a linear trend evaluates which model?",
+    options: ["A. classification", "B. regression", "C. clustering"],
+    correctAnswer: "B"
+  },
+  {
+    id: 29,
+    type: 'single',
+    question: "Predict number of gift cards sold next month.",
+    options: ["A. classification", "B. regression", "C. clustering"],
+    correctAnswer: "B"
+  },
+  {
+    id: 30,
+    type: 'single',
+    question: "Predicting taxi fare. What should be a feature?",
+    options: ["A. number of journeys", "B. trip distance", "C. trip ID"],
+    correctAnswer: "B"
+  },
+  {
+    id: 31,
+    type: 'single',
+    question: "Predict sea level in meters.",
+    options: ["A. classification", "B. regression", "C. clustering"],
+    correctAnswer: "B"
+  },
+  {
+    id: 32_1,
+    type: 'single',
+    question: "True or False: Automated ML automates iterative tasks of model development.",
+    options: ["A. True", "B. False"],
+    correctAnswer: "A"
+  },
+  {
+    id: 32_2,
+    type: 'single',
+    question: "True or False: Automated ML can automatically infer training data from a use case description.",
+    options: ["A. True", "B. False"],
+    correctAnswer: "B"
+  },
+  {
+    id: 33,
+    type: 'single',
+    question: "Predict whether a loan will be repaid (Yes/No).",
+    options: ["A. classification", "B. regression", "C. clustering"],
+    correctAnswer: "A"
+  },
+  {
+    id: 34_1,
+    type: 'single',
+    question: "True or False: Labeling is tagging training data with known values.",
+    options: ["A. True", "B. False"],
+    correctAnswer: "A"
+  },
+  {
+    id: 34_2,
+    type: 'single',
+    question: "True or False: You should evaluate a model using the same data used to train it.",
+    options: ["A. True", "B. False"],
+    correctAnswer: "B"
+  },
+  {
+    id: 34_3,
+    type: 'single',
+    question: "True or False: Accuracy is always the primary metric for performance.",
+    options: ["A. True", "B. False"],
+    correctAnswer: "B"
+  },
+  {
+    id: 37,
+    type: 'multiple',
+    question: "To access a published inference pipeline, which two parameters are needed?",
+    options: ["A. model name", "B. training endpoint", "C. authentication key", "D. REST endpoint"],
+    correctAnswer: ["C", "D"]
+  },
+  {
+    id: 38,
+    type: 'single',
+    question: "Deploy real-time inference pipeline for production to:",
+    options: ["A. Azure Container Instances", "B. Azure Kubernetes Service (AKS)", "C. Azure ML compute"],
+    correctAnswer: "B"
+  },
+  {
+    id: 39,
+    type: 'single',
+    question: "Predicting how many hours of overtime a delivery person will work.",
+    options: ["A. classification", "B. clustering", "C. regression"],
+    correctAnswer: "C"
+  },
+  {
+    id: 40_1,
+    type: 'single',
+    question: "True or False: Azure ML designer uses a drag-and-drop visual canvas.",
+    options: ["A. True", "B. False"],
+    correctAnswer: "A"
+  },
+  {
+    id: 40_3,
+    type: 'single',
+    question: "True or False: Designer enables custom JavaScript functions.",
+    options: ["A. True", "B. False"],
+    correctAnswer: "B"
+  },
+  {
+    id: 41,
+    type: 'single',
+    question: "In a dataset to predict House Price Category, what is 'House Price Category'?",
+    options: ["A. A feature", "B. A label"],
+    correctAnswer: "B"
+  },
+  {
+    id: 42,
+    type: 'single',
+    question: "Azure ML designer lets you create models by:",
+    options: ["A. connecting modules on a visual canvas", "B. writing only Python code", "C. using automated wizards only"],
+    correctAnswer: "A"
+  },
+  {
+    id: 43_1,
+    type: 'single',
+    question: "True or False: AutoML allows custom Python scripts in the pipeline.",
+    options: ["A. True", "B. False"],
+    correctAnswer: "B",
+    explanation: "AutoML is automated; Designer allows custom scripts."
+  },
+  {
+    id: 43_2,
+    type: 'single',
+    question: "True or False: Automated ML implements solutions without programming experience.",
+    options: ["A. True", "B. False"],
+    correctAnswer: "A"
+  },
+  {
+    id: 44,
+    type: 'single',
+    question: "Categorizing brain scan images into haemorrhage types.",
+    options: ["A. clustering", "B. regression", "C. classification"],
+    correctAnswer: "C"
+  },
+  {
+    id: 45,
+    type: 'single',
+    question: "Why split rows into separate subsets?",
+    options: ["A. To train twice", "B. To test the model using data not used in training"],
+    correctAnswer: "B"
+  },
+  {
+    id: 46,
+    type: 'multiple',
+    question: "Tasks requiring Enterprise/Standard workspace?",
+    options: ["A. Graphical UI for Automated ML", "B. Create compute instance", "C. Graphical UI for Designer"],
+    correctAnswer: ["A", "C"]
+  },
+  {
+    id: 47,
+    type: 'multiple',
+    question: "Predict income range. Which two features to use?",
+    options: ["A. Education Level", "B. Last Name", "C. Age", "D. First Name"],
+    correctAnswer: ["A", "C"]
+  },
+  {
+    id: 49_1,
+    type: 'single',
+    question: "True or False: Organizing documents by text similarity is Clustering.",
+    options: ["A. True", "B. False"],
+    correctAnswer: "A"
+  },
+  {
+    id: 49_3,
+    type: 'single',
+    question: "True or False: Predicting allergy severity (mild/moderate/severe) is Clustering.",
+    options: ["A. True", "B. False"],
+    correctAnswer: "B"
+  },
+  {
+    id: 50_1,
+    type: 'single',
+    question: "True or False: A validation set includes input examples used to train the model.",
+    options: ["A. True", "B. False"],
+    correctAnswer: "B"
+  },
+  {
+    id: 51,
+    type: 'multiple',
+    question: "Two metrics to evaluate regression?",
+    options: ["A. R2", "B. F1 score", "C. RMSE", "D. AUC"],
+    correctAnswer: ["A", "C"]
+  },
+  {
+    id: 52,
+    type: 'single',
+    question: "Predicting how many vehicles travel across a bridge.",
+    options: ["A. classification", "B. clustering", "C. regression"],
+    correctAnswer: "C"
+  },
+  {
+    id: 53,
+    type: 'single',
+    question: "Which module to predict automobile price (numeric)?",
+    options: ["A. Linear Regression", "B. Two-Class Logistic Regression", "C. K-Means Clustering"],
+    correctAnswer: "A"
+  },
+  {
+    id: 54,
+    type: 'single',
+    question: "Identify groups of people with similar purchasing habits.",
+    options: ["A. classification", "B. regression", "C. clustering"],
+    correctAnswer: "C"
+  },
+  {
+    id: 55,
+    type: 'single',
+    question: "Predict sale price of auctioned items.",
+    options: ["A. Classification", "B. Clustering", "C. Regression"],
+    correctAnswer: "C"
+  },
+  {
+    id: 56,
+    type: 'single',
+    question: "Metric to evaluate classification?",
+    options: ["A. true positive rate", "B. MAE", "C. RMSE"],
+    correctAnswer: "A"
+  },
+  {
+    id: 57,
+    type: 'multiple',
+    question: "Components to drag onto Designer canvas?",
+    options: ["A. dataset", "B. compute", "C. module", "D. pipeline"],
+    correctAnswer: ["A", "C"]
+  },
+  {
+    id: 58,
+    type: 'single',
+    question: "Module to create training and validation datasets?",
+    options: ["A. Select Columns", "B. Split Data", "C. Join Data"],
+    correctAnswer: "B"
+  },
+  {
+    id: 59_1,
+    type: 'single',
+    question: "Scenario: 'Predict flight delay minutes'. Which type?",
+    options: ["A. Classification", "B. Clustering", "C. Regression"],
+    correctAnswer: "C"
+  },
+  {
+    id: 59_2,
+    type: 'single',
+    question: "Scenario: 'Segment customers into groups'. Which type?",
+    options: ["A. Classification", "B. Clustering", "C. Regression"],
+    correctAnswer: "B"
+  },
+  {
+    id: 59_3,
+    type: 'single',
+    question: "Scenario: 'Predict if student completes course (Yes/No)'. Which type?",
+    options: ["A. Classification", "B. Clustering", "C. Regression"],
+    correctAnswer: "A"
+  },
+  {
+    id: 60,
+    type: 'single',
+    question: "Calculated probability of a correct image classification is:",
+    options: ["A. Accuracy", "B. Confidence", "C. Sentiment"],
+    correctAnswer: "B"
+  },
+  {
+    id: 62,
+    type: 'single',
+    question: "Ensuring numeric variables are on a similar scale is:",
+    options: ["A. data ingestion", "B. feature engineering", "C. model training"],
+    correctAnswer: "B"
+  },
+  {
+    id: 63,
+    type: 'single',
+    question: "Assigning classes to images before training is:",
+    options: ["A. evaluation", "B. labeling", "C. feature engineering"],
+    correctAnswer: "B"
+  },
+  {
+    id: 64_1,
+    type: 'single',
+    question: "In a dataset predicting 'Quality Test' (Pass/Fail) from 'Mass' and 'Temp': Is 'Mass' a feature?",
+    options: ["A. Yes", "B. No"],
+    correctAnswer: "A"
+  },
+  {
+    id: 64_2,
+    type: 'single',
+    question: "Is 'Quality Test' a label?",
+    options: ["A. Yes", "B. No"],
+    correctAnswer: "A"
+  },
+  {
+    id: 65,
+    type: 'single',
+    question: "True or False: You train a regression model using unlabeled data.",
+    options: ["A. True", "B. False"],
+    correctAnswer: "B",
+    explanation: "Regression is supervised learning, requiring labeled data."
+  },
+  {
+    id: 66,
+    type: 'multiple',
+    question: "Actions during data ingestion/preparation?",
+    options: ["A. Calculate accuracy", "B. Combine multiple datasets", "C. Remove records with missing values"],
+    correctAnswer: ["B", "C"]
+  },
+  {
+    id: 67,
+    type: 'single',
+    question: "Predict animal population (numeric).",
+    options: ["A. regression", "B. clustering", "C. classification"],
+    correctAnswer: "A"
+  },
+  {
+    id: 68,
+    type: 'multiple',
+    question: "Languages for custom code in Designer?",
+    options: ["A. Python", "B. R", "C. C#", "D. Java"],
+    correctAnswer: ["A", "B"]
+  },
+  {
+    id: 69,
+    type: 'single',
+    question: "True or False: For a regression model, labels must be numeric.",
+    options: ["A. Yes", "B. No"],
+    correctAnswer: "A"
+  },
+  {
+    id: 150,
+    type: 'single',
+    question: "Function of Split Data module?",
+    options: ["A. scaling numeric variables", "B. creating training and validation datasets", "C. diverting missing data"],
+    correctAnswer: "B"
+  },
+  {
+    id: 155,
+    type: 'single',
+    question: "When should you review evaluation metrics?",
+    options: ["A. Before training", "B. After testing the model", "C. During data cleaning"],
+    correctAnswer: "B"
+  },
+  {
+    id: 159,
+    type: 'single',
+    question: "Technique for anomaly detection?",
+    options: ["A. Classifying user images", "B. Analyzing data over time to identify unusual changes"],
+    correctAnswer: "B"
+  },
+  {
+    id: 163,
+    type: 'single',
+    question: "First step to build classification model?",
+    options: ["A. Load the dataset", "B. Create clustering model", "C. Split data"],
+    correctAnswer: "A"
+  },
+  {
+    id: 164,
+    type: 'single',
+    question: "What to create before running a pipeline in Designer?",
+    options: ["A. registered model", "B. compute resource", "C. notebook"],
+    correctAnswer: "B"
+  },
+  {
+    id: 165_1,
+    type: 'single',
+    question: "Match Task: 'Automated ML'.",
+    options: ["A. UI for quick model selection", "B. Visual canvas for pipelines", "C. Code-based experiments"],
+    correctAnswer: "A"
+  },
+  {
+    id: 165_2,
+    type: 'single',
+    question: "Match Task: 'Designer'.",
+    options: ["A. UI for quick model selection", "B. Drag-and-drop visual canvas", "C. Code-based"],
+    correctAnswer: "B"
+  },
+  {
+    id: 168,
+    type: 'single',
+    question: "Predicting vehicles on a bridge.",
+    options: ["A. regression", "B. translation", "C. classification"],
+    correctAnswer: "A"
+  },
+  {
+    id: 169,
+    type: 'single',
+    question: "Data used as inputs are called:",
+    options: ["A. dataset", "B. labels", "C. variables (features)"],
+    correctAnswer: "C"
+  },
+  {
+    id: 171,
+    type: 'single',
+    question: "Sequence for Designer deployment?",
+    options: ["A. Run pipeline -> Create inference pipeline -> Deploy", "B. Deploy -> Run pipeline -> Create inference pipeline"],
+    correctAnswer: "A"
+  },
+  {
+    id: 174,
+    type: 'single',
+    question: "Create clustering model and evaluate. What to do?",
+    options: ["A. Split dataset into train/test. Use test for evaluation.", "B. Use original dataset for both."],
+    correctAnswer: "A"
+  },
+  {
+    id: 175,
+    type: 'single',
+    question: "Predict numeric value of a column.",
+    options: ["A. clustering", "B. regression", "C. classification"],
+    correctAnswer: "B"
+  },
+  {
+    id: 176,
+    type: 'single',
+    question: "Track multiple versions of a model.",
+    options: ["A. Explain model", "B. Register model", "C. Provision cluster"],
+    correctAnswer: "B"
+  },
+  {
+    id: 177,
+    type: 'single',
+    question: "Identify groups of rows with similar numeric values.",
+    options: ["A. clustering", "B. regression", "C. classification"],
+    correctAnswer: "A"
+  },
+  {
+    id: 212,
+    type: 'single',
+    question: "AutoML task to predict vehicle sale values (price)?",
+    options: ["A. Classification", "B. Regression", "C. Time-series forecasting"],
+    correctAnswer: "B"
+  },
+  {
+    id: 213,
+    type: 'single',
+    question: "Predicting stock price is:",
+    options: ["A. Regression", "B. Classification", "C. Clustering"],
+    correctAnswer: "A"
+  },
+  {
+    id: 215,
+    type: 'single',
+    question: "Predicting if email is spam (Yes/No) is:",
+    options: ["A. Regression", "B. Classification", "C. Clustering"],
+    correctAnswer: "B"
+  },
+  {
+    id: 216,
+    type: 'single',
+    question: "Grouping similar documents is:",
+    options: ["A. Regression", "B. Classification", "C. Clustering"],
+    correctAnswer: "C"
+  },
+  {
+    id: 239_1,
+    type: 'single',
+    question: "Match Description: 'Predicts a category'.",
+    options: ["A. Classification", "B. Clustering", "C. Regression"],
+    correctAnswer: "A"
+  },
+  {
+    id: 239_2,
+    type: 'single',
+    question: "Match Description: 'Predicts a numeric value'.",
+    options: ["A. Classification", "B. Clustering", "C. Regression"],
+    correctAnswer: "C"
+  },
+  {
+    id: 242,
+    type: 'single',
+    question: "Predict agricultural yields (amount).",
+    options: ["A. classification", "B. regression", "C. clustering"],
+    correctAnswer: "B"
+  },
+
+  // --- TOPIC 3: COMPUTER VISION ---
+  {
+    id: 15,
+    type: 'single',
+    question: "Returning a bounding box for a vehicle.",
+    options: ["A. image classification", "B. object detection", "C. OCR"],
+    correctAnswer: "B"
+  },
+  {
+    id: 17,
+    type: 'single',
+    question: "Ensure photos include faces and sunglasses.",
+    options: ["A. Verify", "B. Detect", "C. Describe"],
+    correctAnswer: "B"
+  },
+  {
+    id: 35,
+    type: 'single',
+    question: "Extract text, key/value pairs, tables.",
+    options: ["A. Form Recognizer", "B. Text Analytics", "C. Custom Vision"],
+    correctAnswer: "A"
+  },
+  {
+    id: 36,
+    type: 'single',
+    question: "Extract subtotals from receipt.",
+    options: ["A. Custom Vision", "B. Form Recognizer", "C. Text Analytics"],
+    correctAnswer: "B"
+  },
+  {
+    id: 48,
+    type: 'single',
+    question: "Process retail images for competitor products (custom).",
+    options: ["A. Custom Vision", "B. Form Recognizer", "C. Computer Vision"],
+    correctAnswer: "A"
+  },
+  {
+    id: 70,
+    type: 'single',
+    question: "Recycling machine identifying bottle shape.",
+    options: ["A. anomaly detection", "B. computer vision", "C. NLP"],
+    correctAnswer: "B"
+  },
+  {
+    id: 71_1,
+    type: 'single',
+    question: "True or False: Object detection models can find location of content.",
+    options: ["A. Yes", "B. No"],
+    correctAnswer: "A"
+  },
+  {
+    id: 72,
+    type: 'multiple',
+    question: "Scenarios for Form Recognizer?",
+    options: ["A. Extract invoice number", "B. Find product in catalog", "C. Identify retailer from receipt"],
+    correctAnswer: ["A", "C"]
+  },
+  {
+    id: 73,
+    type: 'single',
+    question: "Counting animals in video feed.",
+    options: ["A. forecasting", "B. computer vision", "C. anomaly detection"],
+    correctAnswer: "B"
+  },
+  {
+    id: 74_1,
+    type: 'single',
+    question: "True or False: Face service can perform facial recognition.",
+    options: ["A. Yes", "B. No"],
+    correctAnswer: "A"
+  },
+  {
+    id: 75,
+    type: 'single',
+    question: "Scan and store expenses from receipts.",
+    options: ["A. image classification", "B. object detection", "C. OCR"],
+    correctAnswer: "C"
+  },
+  {
+    id: 77,
+    type: 'single',
+    question: "Reading numbers on runners' shirts.",
+    options: ["A. facial recognition", "B. OCR", "C. image classification"],
+    correctAnswer: "B"
+  },
+  {
+    id: 78_1,
+    type: 'single',
+    question: "Scenario: 'Separate images of polar bears and brown bears'.",
+    options: ["A. Image classification", "B. Object detection", "C. Semantic segmentation"],
+    correctAnswer: "A"
+  },
+  {
+    id: 78_2,
+    type: 'single',
+    question: "Scenario: 'Determine location of a bear'.",
+    options: ["A. Image classification", "B. Object detection"],
+    correctAnswer: "B"
+  },
+  {
+    id: 78_3,
+    type: 'single',
+    question: "Scenario: 'Determine which pixels are part of a bear'.",
+    options: ["A. Object detection", "B. Semantic segmentation"],
+    correctAnswer: "B"
+  },
+  {
+    id: 79,
+    type: 'single',
+    question: "Drones identifying location of weeds.",
+    options: ["A. object detection", "B. OCR", "C. scene segmentation"],
+    correctAnswer: "A"
+  },
+  {
+    id: 80,
+    type: 'single',
+    question: "Digitize newspaper articles.",
+    options: ["A. Object detection", "B. Facial recognition", "C. OCR"],
+    correctAnswer: "C"
+  },
+  {
+    id: 81_1,
+    type: 'single',
+    question: "Task: 'Do two images belong to same person?'.",
+    options: ["A. Verification", "B. Identification", "C. Similarity"],
+    correctAnswer: "A"
+  },
+  {
+    id: 82,
+    type: 'single',
+    question: "Determine location of cars.",
+    options: ["A. OCR", "B. object detection", "C. image classification"],
+    correctAnswer: "B"
+  },
+  {
+    id: 83,
+    type: 'single',
+    question: "Train object detection using your own images. Which service?",
+    options: ["A. Computer Vision", "B. Custom Vision", "C. Form Recognizer"],
+    correctAnswer: "B"
+  },
+  {
+    id: 84,
+    type: 'single',
+    question: "Locate vehicles in images.",
+    options: ["A. object detection", "B. face detection", "C. OCR"],
+    correctAnswer: "A"
+  },
+  {
+    id: 85,
+    type: 'multiple',
+    question: "Tasks for Computer Vision service?",
+    options: ["A. Train custom model", "B. Detect faces", "C. Recognize handwritten text"],
+    correctAnswer: ["B", "C"]
+  },
+  {
+    id: 86,
+    type: 'single',
+    question: "Use case for classification?",
+    options: ["A. Predicting coffee cups based on sleep", "B. Predicting if someone uses a bike (Yes/No)"],
+    correctAnswer: "B"
+  },
+  {
+    id: 87,
+    type: 'multiple',
+    question: "Tasks for Computer Vision?",
+    options: ["A. Predict stock prices", "B. Detect brands", "C. Detect color scheme"],
+    correctAnswer: ["B", "C"]
+  },
+  {
+    id: 88,
+    type: 'single',
+    question: "Tagging images of friends automatically.",
+    options: ["A. Face", "B. Form Recognizer", "C. Text Analytics"],
+    correctAnswer: "A"
+  },
+  {
+    id: 89,
+    type: 'multiple',
+    question: "Scenarios for Form Recognizer?",
+    options: ["A. Identify retailer from receipt", "B. Translate text", "C. Extract invoice number"],
+    correctAnswer: ["A", "C"]
+  },
+  {
+    id: 90_1,
+    type: 'single',
+    question: "Task: 'Does this person look like other people?'.",
+    options: ["A. Similarity", "B. Identification", "C. Verification"],
+    correctAnswer: "A"
+  },
+  {
+    id: 91,
+    type: 'single',
+    question: "Generate automatic captions.",
+    options: ["A. Recognize text", "B. Detect objects", "C. Describe images"],
+    correctAnswer: "C"
+  },
+  {
+    id: 92,
+    type: 'single',
+    question: "Extract text and tables from scanned docs.",
+    options: ["A. Custom Vision", "B. Face", "C. Form Recognizer"],
+    correctAnswer: "C"
+  },
+  {
+    id: 93,
+    type: 'single',
+    question: "Service to read handwritten text.",
+    options: ["A. OCR", "B. Image Analysis", "C. Face"],
+    correctAnswer: "A"
+  },
+  {
+    id: 149,
+    type: 'single',
+    question: "Service to extract features like objects, faces, adult content.",
+    options: ["A. OCR", "B. Spatial Analysis", "C. Image Analysis"],
+    correctAnswer: "C"
+  },
+  {
+    id: 181_1,
+    type: 'single',
+    question: "True or False: Image Classification can detect location of objects.",
+    options: ["A. True", "B. False"],
+    correctAnswer: "B",
+    explanation: "Object Detection does location; Classification does not."
+  },
+  {
+    id: 182,
+    type: 'single',
+    question: "Label collection of personal digital photos.",
+    options: ["A. Form Recognizer", "B. Custom Vision", "C. Computer Vision"],
+    correctAnswer: "B"
+  },
+  {
+    id: 187,
+    type: 'single',
+    question: "Identify location of widgets.",
+    options: ["A. Custom Vision object detection", "B. Computer Vision Image Analysis"],
+    correctAnswer: "A"
+  },
+  {
+    id: 188,
+    type: 'single',
+    question: "Convert handwritten notes.",
+    options: ["A. facial detection", "B. OCR", "C. image classification"],
+    correctAnswer: "B"
+  },
+  {
+    id: 190,
+    type: 'single',
+    question: "Scan expenses mobile app.",
+    options: ["A. face detection", "B. OCR", "C. object detection"],
+    correctAnswer: "B"
+  },
+  {
+    id: 194,
+    type: 'single',
+    question: "Identify well-known brands (pre-built).",
+    options: ["A. Custom Vision", "B. Form Recognizer", "C. Computer Vision"],
+    correctAnswer: "C"
+  },
+  {
+    id: 214,
+    type: 'single',
+    question: "Convert receipts to transactions.",
+    options: ["A. Custom Vision", "B. Form Recognizer", "C. Face"],
+    correctAnswer: "B"
+  },
+  {
+    id: 217,
+    type: 'single',
+    question: "Security system for authorized staff entry (CCTV).",
+    options: ["A. OCR", "B. facial recognition", "C. image analysis"],
+    correctAnswer: "B"
+  },
+  {
+    id: 218,
+    type: 'multiple',
+    question: "Computer Vision workloads?",
+    options: ["A. Assign color pixels to objects (Segmentation)", "B. Detect anomalies", "C. Describe contents of image"],
+    correctAnswer: ["A", "C"]
+  },
+  {
+    id: 219,
+    type: 'single',
+    question: "Identify coordinates of product on shelf.",
+    options: ["A. Custom Vision classification", "B. Custom Vision object detection", "C. OCR"],
+    correctAnswer: "B"
+  },
+  {
+    id: 220,
+    type: 'single',
+    question: "True or False: Object detection can identify the class of the object.",
+    options: ["A. Yes", "B. No"],
+    correctAnswer: "A"
+  },
+  {
+    id: 221,
+    type: 'single',
+    question: "Tagging images of friends.",
+    options: ["A. Face", "B. Form Recognizer", "C. Computer Vision"],
+    correctAnswer: "A"
+  },
+  {
+    id: 223,
+    type: 'single',
+    question: "Identify location of birds and species.",
+    options: ["A. Object detection", "B. Image classification", "C. OCR"],
+    correctAnswer: "A"
+  },
+  {
+    id: 236,
+    type: 'single',
+    question: "Identify sensitive documents.",
+    options: ["A. Custom Vision", "B. Form Recognizer"],
+    correctAnswer: "B"
+  },
+  {
+    id: 240,
+    type: 'single',
+    question: "Identify competitor products (custom).",
+    options: ["A. Form Recognizer", "B. Custom Vision", "C. Computer Vision"],
+    correctAnswer: "B"
+  },
+  {
+    id: 241,
+    type: 'single',
+    question: "True or False: Computer Vision can analyze live video.",
+    options: ["A. Yes", "B. No"],
+    correctAnswer: "A"
+  },
+  {
+    id: 243,
+    type: 'single',
+    question: "Identify street names.",
+    options: ["A. object detection", "B. OCR", "C. image classification"],
+    correctAnswer: "B"
+  },
+  {
+    id: 244,
+    type: 'single',
+    question: "Match Scenario: 'Detect person in room'.",
+    options: ["A. Object detection", "B. OCR", "C. Classification"],
+    correctAnswer: "A"
+  },
+  {
+    id: 245,
+    type: 'single',
+    question: "Identify brand names in supermarket shelves.",
+    options: ["A. Computer Vision Image Analysis", "B. Custom Vision", "C. Language Understanding"],
+    correctAnswer: "A"
+  },
+
+  // --- TOPIC 4: NLP & SPEECH ---
+  {
+    id: 13,
+    type: 'single',
+    question: "Extract dates and quantities from text.",
+    options: ["A. Key phrase extraction", "B. Named Entity Recognition (NER)", "C. Sentiment Analysis"],
+    correctAnswer: "B"
+  },
+  {
+    id: 94,
+    type: 'single',
+    question: "Identify main talking points.",
+    options: ["A. entity recognition", "B. key phrase extraction", "C. sentiment analysis"],
+    correctAnswer: "B"
+  },
+  {
+    id: 95,
+    type: 'multiple',
+    question: "Speech Recognition scenarios?",
+    options: ["A. in-car system reading texts", "B. closed captions", "C. transcript of meeting"],
+    correctAnswer: ["B", "C"]
+  },
+  {
+    id: 96,
+    type: 'single',
+    question: "Service to transcribe audio to text.",
+    options: ["A. Speech-to-Text", "B. Text-to-Speech", "C. Translation"],
+    correctAnswer: "A"
+  },
+  {
+    id: 98_1,
+    type: 'single',
+    question: "True or False: Text Analytics can detect language.",
+    options: ["A. Yes", "B. No"],
+    correctAnswer: "A"
+  },
+  {
+    id: 99,
+    type: 'single',
+    question: "Detect customer upset (sentiment).",
+    options: ["A. anomaly detection", "B. computer vision", "C. natural language processing"],
+    correctAnswer: "C"
+  },
+  {
+    id: 100,
+    type: 'multiple',
+    question: "Services for knowledge base bot?",
+    options: ["A. QnA Maker", "B. Azure Bot Service", "C. Form Recognizer"],
+    correctAnswer: ["A", "B"]
+  },
+  {
+    id: 101,
+    type: 'multiple',
+    question: "Speech Synthesis scenarios?",
+    options: ["A. Automated voice reading number", "B. Live captions", "C. AI character speaking"],
+    correctAnswer: ["A", "C"]
+  },
+  {
+    id: 102_1,
+    type: 'single',
+    question: "True or False: Translator service provides multi-language text translation.",
+    options: ["A. Yes", "B. No"],
+    correctAnswer: "A"
+  },
+  {
+    id: 103_1,
+    type: 'single',
+    question: "Task: 'Identify companies in article'.",
+    options: ["A. Entity recognition", "B. Sentiment Analysis"],
+    correctAnswer: "A"
+  },
+  {
+    id: 104,
+    type: 'single',
+    question: "QnA Maker file format?",
+    options: ["A. PPTX", "B. XML", "C. PDF"],
+    correctAnswer: "C"
+  },
+  {
+    id: 105,
+    type: 'single',
+    question: "Use key phrase extraction to:",
+    options: ["A. identify sentiment", "B. identify documents with same topics", "C. translate"],
+    correctAnswer: "B"
+  },
+  {
+    id: 106,
+    type: 'single',
+    question: "Extract key terms from reports.",
+    options: ["A. NLP", "B. conversational AI", "C. computer vision"],
+    correctAnswer: "A"
+  },
+  {
+    id: 107,
+    type: 'single',
+    question: "Service for 'document categorization'.",
+    options: ["A. NLP", "B. Computer Vision", "C. Speech"],
+    correctAnswer: "A"
+  },
+  {
+    id: 108,
+    type: 'single',
+    question: "Interpret 'Call me back later'.",
+    options: ["A. Translator", "B. Text Analytics", "C. LUIS"],
+    correctAnswer: "C"
+  },
+  {
+    id: 109,
+    type: 'single',
+    question: "Determine user's intent.",
+    options: ["A. Translator", "B. QnA Maker", "C. LUIS"],
+    correctAnswer: "C"
+  },
+  {
+    id: 110,
+    type: 'single',
+    question: "Translate press releases.",
+    options: ["A. Translator", "B. Text Analytics", "C. LUIS"],
+    correctAnswer: "A"
+  },
+  {
+    id: 111_1,
+    type: 'single',
+    question: "True or False: Text Analytics can detect input language.",
+    options: ["A. Yes", "B. No"],
+    correctAnswer: "A"
+  },
+  {
+    id: 112_1,
+    type: 'single',
+    question: "Task: 'Identify person/location'.",
+    options: ["A. Entity recognition", "B. Sentiment analysis"],
+    correctAnswer: "A"
+  },
+  {
+    id: 113_1,
+    type: 'single',
+    question: "True or False: Content Moderator checks for offensive text.",
+    options: ["A. Yes", "B. No"],
+    correctAnswer: "A"
+  },
+  {
+    id: 114,
+    type: 'single',
+    question: "Analyze review positive/negative.",
+    options: ["A. language detection", "B. sentiment analysis", "C. key phrase extraction"],
+    correctAnswer: "B"
+  },
+  {
+    id: 115,
+    type: 'single',
+    question: "Find 'Microsoft' in text.",
+    options: ["A. entity recognition", "B. key phrase extraction", "C. sentiment analysis"],
+    correctAnswer: "A"
+  },
+  {
+    id: 116_1,
+    type: 'single',
+    question: "Feature: 'Determine positive/negative'.",
+    options: ["A. Sentiment analysis", "B. Entity recognition"],
+    correctAnswer: "A"
+  },
+  {
+    id: 117,
+    type: 'single',
+    question: "User input 'Which act is playing?' is:",
+    options: ["A. an intent", "B. an utterance", "C. an entity"],
+    correctAnswer: "B"
+  },
+  {
+    id: 118,
+    type: 'single',
+    question: "Add chit-chat to QnA bot.",
+    options: ["A. Enable active learning", "B. Add chit-chat"],
+    correctAnswer: "B"
+  },
+  {
+    id: 119,
+    type: 'single',
+    question: "Process Word doc and FAQ page for chatbot.",
+    options: ["A. Azure Bot Service", "B. LUIS", "C. QnA Maker"],
+    correctAnswer: "C"
+  },
+  {
+    id: 120,
+    type: 'single',
+    question: "Handle utterances outside scope.",
+    options: ["A. Test new utterances", "B. Add to None intent", "C. Create entity"],
+    correctAnswer: "B"
+  },
+  {
+    id: 121,
+    type: 'multiple',
+    question: "NLP workloads?",
+    options: ["A. Smart device answering questions", "B. Website responding to questions", "C. Monitoring temp"],
+    correctAnswer: ["A", "B"]
+  },
+  {
+    id: 122,
+    type: 'multiple',
+    question: "Voice control smart device workloads?",
+    options: ["A. speech-to-text", "B. language modeling", "C. translation"],
+    correctAnswer: ["A", "B"]
+  },
+  {
+    id: 123_1,
+    type: 'single',
+    question: "True or False: Language service can detect language.",
+    options: ["A. Yes", "B. No"],
+    correctAnswer: "A"
+  },
+  {
+    id: 124_1,
+    type: 'single',
+    question: "Service for 'Transcribe speech to text'.",
+    options: ["A. Speech", "B. Language"],
+    correctAnswer: "A"
+  },
+  {
+    id: 125,
+    type: 'single',
+    question: "Make press releases available in multiple languages.",
+    options: ["A. Speech", "B. Language", "C. Translator"],
+    correctAnswer: "C"
+  },
+  {
+    id: 126,
+    type: 'single',
+    question: "Extract key terms from insurance reports.",
+    options: ["A. anomaly detection", "B. natural language processing", "C. computer vision"],
+    correctAnswer: "B"
+  },
+  {
+    id: 127,
+    type: 'single',
+    question: "Read recipe instructions aloud.",
+    options: ["A. Translator", "B. Speech", "C. Personalizer"],
+    correctAnswer: "B"
+  },
+  {
+    id: 128,
+    type: 'single',
+    question: "Improve QnA relevance with user feedback.",
+    options: ["A. key phrase extraction", "B. active learning"],
+    correctAnswer: "B"
+  },
+  {
+    id: 129,
+    type: 'single',
+    question: "Conversational AI on Teams/Email.",
+    options: ["A. Text Analytics", "B. Azure Bot Service", "C. Translator"],
+    correctAnswer: "B"
+  },
+  {
+    id: 130_1,
+    type: 'single',
+    question: "True or False: QnA Maker can ingest FAQ URLs.",
+    options: ["A. Yes", "B. No"],
+    correctAnswer: "A"
+  },
+  {
+    id: 131,
+    type: 'multiple',
+    question: "QnA Maker content sources?",
+    options: ["A. Existing webpage", "B. Manual entry", "C. Chit-chat", "D. AutoML"],
+    correctAnswer: ["A", "B", "C"]
+  },
+  {
+    id: 132,
+    type: 'single',
+    question: "Support system from FAQ PDF.",
+    options: ["A. QnA Maker", "B. Text Analytics"],
+    correctAnswer: "A"
+  },
+  {
+    id: 133,
+    type: 'multiple',
+    question: "Reduce load on operators (Chatbot).",
+    options: ["A. QnA Maker", "B. Azure Bot Service", "C. Translator"],
+    correctAnswer: ["A", "B"]
+  },
+  {
+    id: 134,
+    type: 'multiple',
+    question: "Conversational AI examples?",
+    options: ["A. Smart home device", "B. Website chatbot", "C. Assembly line"],
+    correctAnswer: ["A", "B"]
+  },
+  {
+    id: 135,
+    type: 'single',
+    question: "Process: User types -> AI answers from KB. What solution?",
+    options: ["A. sentiment analysis", "B. chatbot", "C. computer vision"],
+    correctAnswer: "B"
+  },
+  {
+    id: 136,
+    type: 'single',
+    question: "Web app guiding to best resource/answer.",
+    options: ["A. Custom Vision", "B. QnA Maker", "C. Face"],
+    correctAnswer: "B"
+  },
+  {
+    id: 137,
+    type: 'single',
+    question: "Bot from FAQ document.",
+    options: ["A. QnA Maker", "B. LUIS", "C. Text Analytics"],
+    correctAnswer: "A"
+  },
+  {
+    id: 138,
+    type: 'single',
+    question: "Tools to build/connect bots.",
+    options: ["A. Conversational AI", "B. Computer Vision"],
+    correctAnswer: "A"
+  },
+  {
+    id: 139,
+    type: 'single',
+    question: "Example of webchat bot?",
+    options: ["A. Translate questions", "B. Route emails", "C. Answer questions on website interface"],
+    correctAnswer: "C"
+  },
+  {
+    id: 140_1,
+    type: 'single',
+    question: "True or False: QnA Maker creates a knowledge base.",
+    options: ["A. Yes", "B. No"],
+    correctAnswer: "A"
+  },
+  {
+    id: 141_1,
+    type: 'single',
+    question: "True or False: LUIS is for intent classification.",
+    options: ["A. Yes", "B. No"],
+    correctAnswer: "A"
+  },
+  {
+    id: 144_1,
+    type: 'single',
+    question: "True or False: Azure Bot Service integrates with Cognitive Services.",
+    options: ["A. Yes", "B. No"],
+    correctAnswer: "A"
+  },
+  {
+    id: 146,
+    type: 'single',
+    question: "Basic QnA bot capability?",
+    options: ["A. Register purchases", "B. Answer questions from multiple users", "C. Provide RMA numbers"],
+    correctAnswer: "B"
+  },
+  {
+    id: 147_1,
+    type: 'single',
+    question: "True or False: You can connect a bot to Email channel.",
+    options: ["A. Yes", "B. No"],
+    correctAnswer: "A"
+  },
+  {
+    id: 152,
+    type: 'single',
+    question: "Scenario: 'Translate English to French'.",
+    options: ["A. Translation", "B. Sentiment Analysis"],
+    correctAnswer: "A"
+  },
+  {
+    id: 195,
+    type: 'single',
+    question: "NLP use case?",
+    options: ["A. Classify email messages", "B. Classify images"],
+    correctAnswer: "A"
+  },
+  {
+    id: 196,
+    type: 'multiple',
+    question: "Bot querying KB with NLP. Services?",
+    options: ["A. Language Service", "B. Azure Bot Service", "C. Anomaly Detector"],
+    correctAnswer: ["A", "B"]
+  },
+  {
+    id: 198,
+    type: 'single',
+    question: "Analyze tone of social media posts.",
+    options: ["A. sentiment analysis", "B. speech recognition", "C. entity recognition"],
+    correctAnswer: "A"
+  },
+  {
+    id: 199,
+    type: 'single',
+    question: "Retrieve order status/support docs.",
+    options: ["A. sentiment analysis", "B. named entity recognition", "C. translation"],
+    correctAnswer: "B"
+  },
+  {
+    id: 202,
+    type: 'single',
+    question: "Present reviews in user's language.",
+    options: ["A. key phrase extraction", "B. translation", "C. speech recognition"],
+    correctAnswer: "B"
+  },
+  {
+    id: 205,
+    type: 'single',
+    question: "Extract city names from posts.",
+    options: ["A. sentiment analysis", "B. entity recognition", "C. key phrase extraction"],
+    correctAnswer: "B"
+  },
+  {
+    id: 207,
+    type: 'single',
+    question: "Identify main talking points.",
+    options: ["A. language detection", "B. key phrase extraction", "C. entity recognition"],
+    correctAnswer: "B"
+  },
+  {
+    id: 209,
+    type: 'single',
+    question: "Entity for phone number?",
+    options: ["A. regular expression", "B. machine-learned", "C. list"],
+    correctAnswer: "A"
+  },
+  {
+    id: 224,
+    type: 'single',
+    question: "Read manuscripts in different languages and categorize.",
+    options: ["A. translation & key phrase extraction", "B. speech & entity recognition"],
+    correctAnswer: "A"
+  },
+  {
+    id: 226,
+    type: 'single',
+    question: "Generate narration from script.",
+    options: ["A. speech synthesis", "B. speech recognition"],
+    correctAnswer: "A"
+  },
+  {
+    id: 227_1,
+    type: 'single',
+    question: "True or False: LUIS requires utterances for training.",
+    options: ["A. Yes", "B. No"],
+    correctAnswer: "A"
+  },
+  {
+    id: 228,
+    type: 'single',
+    question: "Extract intent from 'Call me back'.",
+    options: ["A. Language", "B. Translator", "C. Speech"],
+    correctAnswer: "A"
+  },
+  {
+    id: 229,
+    type: 'single',
+    question: "Detect utterances outside scope.",
+    options: ["A. Add to None intent", "B. Create new model"],
+    correctAnswer: "A"
+  },
+  {
+    id: 233,
+    type: 'single',
+    question: "Query order status via phone/social.",
+    options: ["A. Azure Bot Service", "B. Translator"],
+    correctAnswer: "A"
+  },
+  {
+    id: 234,
+    type: 'single',
+    question: "Conversational AI on Teams/Alexa.",
+    options: ["A. Azure Bot Service", "B. Cognitive Search"],
+    correctAnswer: "A"
+  },
+  {
+    id: 238,
+    type: 'single',
+    question: "Smart device answering stock price question.",
+    options: ["A. NLP", "B. Knowledge mining"],
+    correctAnswer: "A"
+  },
+  {
+    id: 246,
+    type: 'single',
+    question: "Determine user's intent.",
+    options: ["A. Language", "B. Translator"],
+    correctAnswer: "A"
+  }
+];
+
+// --- Helper Function: Shuffle Array ---
+const shuffleArray = (array) => {
+  const shuffled = [...array];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled;
+};
+
+// --- Helper: Check Equality of Arrays (for Multiple Choice) ---
+const arraysEqual = (a, b) => {
+  if (!Array.isArray(a) || !Array.isArray(b)) return false;
+  if (a.length !== b.length) return false;
+  const sortedA = [...a].sort();
+  const sortedB = [...b].sort();
+  return sortedA.every((val, index) => val === sortedB[index]);
+};
+
+export default function App() {
+  // --- State ---
+  const [appState, setAppState] = useState('setup'); 
+  const [examQuestions, setExamQuestions] = useState([]);
+  const [questionCount, setQuestionCount] = useState(10);
+  const [currentQIndex, setCurrentQIndex] = useState(0);
+  const [userAnswers, setUserAnswers] = useState({});
+  const [showAnswer, setShowAnswer] = useState(false);
+  const [filterType, setFilterType] = useState('all'); // 'all', 'single', 'multiple'
+
+  // --- Calculate Max Available Questions Based on Filter ---
+  const maxQuestions = useMemo(() => {
+    if (filterType === 'all') return QUESTION_BANK.length;
+    return QUESTION_BANK.filter(q => q.type === filterType).length;
+  }, [filterType]);
+
+  // --- Effect: Clamp questionCount if it exceeds max available ---
+  useEffect(() => {
+    if (questionCount > maxQuestions) {
+      setQuestionCount(maxQuestions);
+    }
+  }, [maxQuestions, questionCount]);
+
+  // --- Logic: Start Exam ---
+  const startExam = () => {
+    let filtered = QUESTION_BANK;
+    if (filterType !== 'all') {
+      filtered = QUESTION_BANK.filter(q => q.type === filterType);
+    }
+    const shuffled = shuffleArray(filtered);
+    const count = Math.min(questionCount, shuffled.length); 
+    setExamQuestions(shuffled.slice(0, count));
+    setCurrentQIndex(0);
+    setUserAnswers({});
+    setShowAnswer(false);
+    setAppState('exam');
+  };
+
+  // --- Logic: Navigation ---
+  const handleNext = () => {
+    if (currentQIndex < examQuestions.length - 1) {
+      setCurrentQIndex(prev => prev + 1);
+      setShowAnswer(false);
+    }
+  };
+
+  const handlePrev = () => {
+    if (currentQIndex > 0) {
+      setCurrentQIndex(prev => prev - 1);
+      setShowAnswer(false);
+    }
+  };
+
+  // --- Logic: Handle Selection ---
+  const handleOptionSelect = (option) => {
+    const currentQ = examQuestions[currentQIndex];
+    const selectedLetter = option.charAt(0);
+    
+    if (currentQ.type === 'single') {
+      setUserAnswers(prev => ({ ...prev, [currentQ.id]: selectedLetter }));
+    } else {
+      setUserAnswers(prev => {
+        const currentSelected = prev[currentQ.id] || [];
+        if (currentSelected.includes(selectedLetter)) {
+          return { ...prev, [currentQ.id]: currentSelected.filter(l => l !== selectedLetter) };
+        } else {
+          return { ...prev, [currentQ.id]: [...currentSelected, selectedLetter] };
+        }
+      });
+    }
+  };
+
+  // --- Logic: Review ---
+  const goToReviewQuestion = (index) => {
+    setCurrentQIndex(index);
+    setAppState('review');
+    setShowAnswer(false);
+  };
+
+  // --- Calculations ---
+  const scoreData = useMemo(() => {
+    if (examQuestions.length === 0) return { score: 0, correct: 0, incorrect: 0, percentage: 0 };
+    let correct = 0;
+    examQuestions.forEach(q => {
+      const userAnswer = userAnswers[q.id];
+      if (q.type === 'single') {
+        if (userAnswer === q.correctAnswer) correct++;
+      } else {
+        if (arraysEqual(userAnswer, q.correctAnswer)) correct++;
+      }
+    });
+    const percentage = Math.round((correct / examQuestions.length) * 100);
+    return { correct, incorrect: examQuestions.length - correct, percentage, passed: percentage >= 70 };
+  }, [examQuestions, userAnswers]);
+
+  // 1. SETUP SCREEN
+  if (appState === 'setup') {
+    return (
+      <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-4 font-sans">
+        <div className="bg-white p-8 rounded-xl shadow-lg max-w-md w-full border-t-4 border-blue-600">
+          <div className="flex justify-center mb-6">
+            <BookOpen size={48} className="text-blue-600" />
+          </div>
+          <h1 className="text-2xl font-bold text-center text-gray-800 mb-2">AI-900 Mock Test</h1>
+          <p className="text-center text-gray-500 mb-8">Azure AI Fundamentals</p>
+          
+          <div className="space-y-6">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Filter Questions
+              </label>
+              <div className="flex space-x-2 mb-4">
+                 {['all', 'single', 'multiple'].map(type => (
+                   <button
+                    key={type}
+                    onClick={() => setFilterType(type)}
+                    className={`px-3 py-1 rounded-full text-xs font-bold capitalize ${filterType === type ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-600'}`}
+                   >
+                     {type} Choice
+                   </button>
+                 ))}
+              </div>
+
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Number of Questions (Max {maxQuestions})
+              </label>
+              <div className="flex items-center space-x-4">
+                <input 
+                  type="range" 
+                  min="1" 
+                  max={maxQuestions}
+                  value={questionCount}
+                  onChange={(e) => setQuestionCount(parseInt(e.target.value))}
+                  className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                />
+                <span className="font-bold text-blue-600 w-12 text-center">{questionCount}</span>
+              </div>
+            </div>
+
+            <button onClick={startExam} className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition flex items-center justify-center">
+              Start Exam
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // 2. EXAM & REVIEW SCREEN
+  if (appState === 'exam' || appState === 'review') {
+    const question = examQuestions[currentQIndex];
+    const isReview = appState === 'review';
+    const selectedAnswer = userAnswers[question.id]; 
+    const isMultiple = question.type === 'multiple';
+
+    return (
+      <div className="min-h-screen bg-gray-50 flex flex-col font-sans">
+        <header className="bg-white shadow-sm p-4 flex justify-between items-center sticky top-0 z-10">
+          <div className="flex items-center space-x-2">
+             {isReview && (
+               <button onClick={() => setAppState('results')} className="text-gray-600 hover:text-gray-900 mr-2"><ChevronLeft size={24} /></button>
+             )}
+             <h2 className="font-bold text-gray-700">{isReview ? 'Review Mode' : 'Mock Test'}</h2>
+          </div>
+          <div className="text-sm font-medium text-blue-600 bg-blue-50 px-3 py-1 rounded-full">
+            Question {currentQIndex + 1} / {examQuestions.length}
+          </div>
+        </header>
+
+        <main className="flex-grow container mx-auto max-w-3xl p-4 pb-24">
+          <div className="bg-white rounded-xl shadow-sm p-6 mb-6 border border-gray-100">
+            {isMultiple && (
+              <div className="mb-4 inline-block bg-indigo-100 text-indigo-800 text-xs font-semibold px-2.5 py-0.5 rounded">
+                Select {question.correctAnswer.length} Options
+              </div>
+            )}
+            <h3 className="text-lg font-medium text-gray-800 leading-relaxed mb-6">{question.question}</h3>
+            <div className="space-y-3">
+              {question.options.map((opt) => {
+                const optLetter = opt.charAt(0);
+                let isSelected = isMultiple ? selectedAnswer?.includes(optLetter) : selectedAnswer === optLetter;
+                let isTheCorrectAnswer = isMultiple ? question.correctAnswer.includes(optLetter) : question.correctAnswer === optLetter;
+                
+                let baseStyle = "w-full text-left p-4 rounded-lg border-2 transition duration-200 flex items-center group ";
+                let icon = null;
+
+                if (isReview) {
+                  if (isTheCorrectAnswer) {
+                    baseStyle += "border-green-500 bg-green-50 text-green-800";
+                    icon = <CheckCircle size={20}/>;
+                  } else if (isSelected && !isTheCorrectAnswer) {
+                    baseStyle += "border-red-500 bg-red-50 text-red-800";
+                    icon = <XCircle size={20}/>;
+                  } else {
+                    baseStyle += "border-gray-200 opacity-60";
+                    icon = isMultiple ? <Square size={20}/> : <div className="w-5 h-5 rounded-full border border-gray-400"></div>;
+                  }
+                } else {
+                  if (isSelected) {
+                    baseStyle += "border-blue-600 bg-blue-50 text-blue-800";
+                    icon = isMultiple ? <CheckSquare size={20}/> : <div className="w-5 h-5 rounded-full border-4 border-blue-600"></div>;
+                  } else {
+                    baseStyle += "border-gray-200 hover:border-blue-300 hover:bg-gray-50 text-gray-700";
+                    icon = isMultiple ? <Square size={20}/> : <div className="w-5 h-5 rounded-full border border-gray-400"></div>;
+                  }
+                }
+
+                return (
+                  <button key={opt} onClick={() => !isReview && handleOptionSelect(opt)} disabled={isReview} className={baseStyle}>
+                    <div className={`mr-4 flex-shrink-0 ${isReview && isTheCorrectAnswer ? 'text-green-600' : isReview && isSelected ? 'text-red-600' : isSelected ? 'text-blue-600' : 'text-gray-400'}`}>
+                      {icon}
+                    </div>
+                    <span className="text-sm md:text-base">{opt.substring(3)}</span> 
+                  </button>
+                );
+              })}
+            </div>
+            
+            {(showAnswer && !isReview) || isReview ? (
+              <div className={`mt-6 p-4 rounded-lg ${isReview ? 'bg-gray-50 border-gray-200' : 'bg-green-50 border-green-200'} border`}>
+                <p className={`${isReview ? 'text-gray-800' : 'text-green-800'} font-medium flex items-center mb-2`}>
+                  {isReview ? null : <CheckCircle size={20} className="mr-2" />}
+                  Correct Answer: {Array.isArray(question.correctAnswer) ? question.correctAnswer.join(", ") : question.correctAnswer}
+                </p>
+                {question.explanation && (
+                  <div className={`text-sm ${isReview ? 'text-gray-600' : 'text-green-700'} border-t ${isReview ? 'border-gray-200' : 'border-green-200'} pt-2 mt-2 flex`}>
+                    <Book size={16} className="mr-2 flex-shrink-0 mt-1"/>
+                    <span>{question.explanation}</span>
+                  </div>
+                )}
+              </div>
+            ) : null}
+          </div>
+        </main>
+
+        <footer className="bg-white border-t border-gray-200 p-4 fixed bottom-0 w-full">
+          <div className="container mx-auto max-w-3xl flex justify-between items-center">
+            <button onClick={handlePrev} disabled={currentQIndex === 0} className={`p-2 rounded-lg flex items-center ${currentQIndex === 0 ? 'text-gray-300 cursor-not-allowed' : 'text-gray-600 hover:bg-gray-100'}`}>
+              <ChevronLeft className="mr-1" size={20}/><span className="hidden md:inline">Prev</span>
+            </button>
+            <div className="flex space-x-3">
+              {!isReview && (
+                <button onClick={() => setShowAnswer(!showAnswer)} className="px-4 py-2 bg-amber-100 text-amber-700 rounded-lg font-medium hover:bg-amber-200 transition flex items-center">
+                  <Eye size={18} className="mr-2"/> Ans
+                </button>
+              )}
+              {currentQIndex === examQuestions.length - 1 ? (
+                !isReview ? (
+                   <button onClick={finishExam} className="px-6 py-2 bg-green-600 text-white rounded-lg font-bold hover:bg-green-700 shadow-md transition transform active:scale-95">Complete</button>
+                ) : (
+                  <button onClick={() => setAppState('results')} className="px-6 py-2 bg-gray-800 text-white rounded-lg font-medium hover:bg-gray-900">Back to Results</button>
+                )
+              ) : (
+                <button onClick={handleNext} className="px-6 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 shadow-md transition">
+                  <span className="hidden md:inline mr-1">Next</span> <ChevronRight size={20}/>
+                </button>
+              )}
+            </div>
+          </div>
+        </footer>
+      </div>
+    );
+  }
+
+  // 3. RESULTS SCREEN
+  if (appState === 'results') {
+    return (
+      <div className="min-h-screen bg-gray-50 p-4 font-sans">
+        <div className="max-w-2xl mx-auto space-y-6">
+          <div className="bg-white rounded-xl shadow-md p-8 text-center relative overflow-hidden">
+            <div className={`absolute top-0 left-0 w-full h-2 ${scoreData.passed ? 'bg-green-500' : 'bg-red-500'}`}></div>
+            <div className="flex justify-center mb-4">
+              {scoreData.passed ? <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center text-green-600"><Award size={40} /></div> : <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center text-red-600"><AlertCircle size={40} /></div>}
+            </div>
+            <h2 className="text-3xl font-bold text-gray-800 mb-2">{scoreData.passed ? 'Passed!' : 'Failed'}</h2>
+            <div className="text-5xl font-extrabold text-blue-600 mb-2">{scoreData.percentage}%</div>
+            <p className="text-gray-500 mb-6">You answered {scoreData.correct} out of {examQuestions.length} correctly.<br/><span className="text-xs text-gray-400">(Pass mark: 70%)</span></p>
+            <div className="flex justify-center space-x-4">
+              <button onClick={startExam} className="flex items-center px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"><RotateCcw size={18} className="mr-2"/> Retry</button>
+               <button onClick={() => setAppState('setup')} className="flex items-center px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition">New Test</button>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-xl shadow-md p-6">
+            <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center"><Eye className="mr-2 text-gray-500" size={20}/> Review Questions</h3>
+            <div className="grid grid-cols-5 sm:grid-cols-8 md:grid-cols-10 gap-3">
+              {examQuestions.map((q, index) => {
+                const userAnswer = userAnswers[q.id];
+                let isCorrect = q.type === 'single' ? userAnswer === q.correctAnswer : arraysEqual(userAnswer, q.correctAnswer);
+                return (
+                  <button key={q.id} onClick={() => goToReviewQuestion(index)} className={`h-10 w-full rounded-md font-bold text-sm transition transform hover:scale-105 ${isCorrect ? 'bg-green-100 text-green-700 hover:bg-green-200 border border-green-200' : 'bg-red-100 text-red-700 hover:bg-red-200 border border-red-200'}`}>
+                    {index + 1}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+  return null;
+}
